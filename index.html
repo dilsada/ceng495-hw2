@@ -13,7 +13,6 @@
 <h2>Invention Gallery</h2>
 
     Name: <input type="text" id="name" style="border:2px solid DodgerBlue;" >
-    <h3></h3>
 
     <button class="button" onclick="addUser()" value="addUser">Add</button>
     <button class="button" onclick="deleteUser()" value="deleteUser">Delete</button>
@@ -82,7 +81,7 @@
         
             myDocument.then(function(result){
                 if(result != null){
-                    loadUrl("./users.html?name=" + loginName);
+                    loadUrl("./user.html?name=" + loginName);
                 }
                 else{
                     alert("There is no such a user.");

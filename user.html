@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <title>Invention Gallery Profile</title>
+    <script src="https://s3.amazonaws.com/stitch-sdks/js/bundles/4.6.0/stitch.js"></script>
+</head>
+
+<body>
+
+    <h1 id="username"></h1>
+
+    <div>
+      <p>Add Invention</p>
+      
+      Product Name: <input type="text" style="border:2px solid DodgerBlue;" id="productName" >
+      Product Photo Link: <input type="text" style="border:2px solid DodgerBlue;" id="productPhoto" >
+      Product Cost: <input type="text" style="border:2px solid DodgerBlue;" id="productCost" >
+      Product Material: <input type="text" style="border:2px solid DodgerBlue;" id="productMaterial" >
+      
+      <button class="button" onclick="addInvention()" value="addInvention">Add Invention</button>
+    </div>
+    
+    <script>
+      const client = stitch.Stitch.initializeDefaultAppClient('hw2-app-kktvp');
+      const db = client.getServiceClient(stitch.RemoteMongoClient.factory, 'mongodb-atlas').db('ceng495_hw2_db');
+      const name = (new URL(window.location.href)).searchParams.get("name");
+      const criteria = {user_name: name}
+
+      document.getElementById('username').innerHTML = name;
+    </script>
+    
+    <script>
+      function addInvention(){
+        var myDocument = db.collection('users').findOne(criteria);
+        myDocument.then(function(result){
+
+          if(result != null){
+
+            var products = result.inventions;
+            var new_product = {productName: document.getElementById("productName").value, productPhoto: document.getElementById("productPhoto").value
+            , productCost: document.getElementById("productCost").value, productMaterial: document.getElementById("productMaterial").value, 
+            ratings: [], totalRating: 0};
+
+            products.push(new_product);
+            var updateStore = {inventions: products};
+            
+            db.collection('users').updateOne(criteria,{$set: updateStore});
+            console.log("New item added.")
+          }
+        });
+      }
+    </script>
+
+</body>
+
+</html>
