@@ -1,57 +1,130 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-    <meta content="utf-8" http-equiv="encoding">
-    <title>Invention Gallery Profile</title>
-    <script src="https://s3.amazonaws.com/stitch-sdks/js/bundles/4.6.0/stitch.js"></script>
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+  <meta content="utf-8" http-equiv="encoding">
+  <title>Invention Gallery Profile</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://s3.amazonaws.com/stitch-sdks/js/bundles/4.6.0/stitch.js"></script>
 </head>
 
 <body>
 
+  <div class="header">
     <h1 id="username"></h1>
+    <h1 id="userRating"></h1>
+  </div>
 
-    <div>
-      <p>Add Invention</p>
-      
-      Product Name: <input type="text" style="border:2px solid DodgerBlue;" id="productName" >
-      Product Photo Link: <input type="text" style="border:2px solid DodgerBlue;" id="productPhoto" >
-      Product Cost: <input type="text" style="border:2px solid DodgerBlue;" id="productCost" >
-      Product Material: <input type="text" style="border:2px solid DodgerBlue;" id="productMaterial" >
-      
-      <button class="button" onclick="addInvention()" value="addInvention">Add Invention</button>
-    </div>
+  <div>
+    <p>Add Invention</p>
+
+    Product Name: <input type="text" style="border:2px solid DodgerBlue;" id="productName">
+    Product Photo Link: <input type="text" style="border:2px solid DodgerBlue;" id="productPhoto">
+    Product Cost: <input type="text" style="border:2px solid DodgerBlue;" id="productCost">
+    Product Material: <input type="text" style="border:2px solid DodgerBlue;" id="productMaterial">
+
+    <button class="button" onclick="addInvention()" value="addInvention">Add Invention</button>
+  </div>
+
+  <div class="gallery">
+    <p>My Inventions</p>
+    <div id="myInventions"></div>
+
+    <p>All Inventions</p>
+    <div id="allInventions"></div>
     
-    <script>
-      const client = stitch.Stitch.initializeDefaultAppClient('hw2-app-kktvp');
-      const db = client.getServiceClient(stitch.RemoteMongoClient.factory, 'mongodb-atlas').db('ceng495_hw2_db');
-      const name = (new URL(window.location.href)).searchParams.get("name");
-      const criteria = {user_name: name}
+  </div>
 
-      document.getElementById('username').innerHTML = name;
-    </script>
+
+  <script>
+    const client = stitch.Stitch.initializeDefaultAppClient('hw2-app-kktvp');
+    const db = client.getServiceClient(stitch.RemoteMongoClient.factory, 'mongodb-atlas').db('ceng495_hw2_db');
+    const name = (new URL(window.location.href)).searchParams.get("name");
+    const criteria = { user_name: name }
+
+    document.getElementById('username').innerHTML = name;
     
-    <script>
-      function addInvention(){
-        var myDocument = db.collection('users').findOne(criteria);
-        myDocument.then(function(result){
+    var myDocument = db.collection('users').findOne(criteria);
+    myDocument.then(function (result){
+      var products = result.inventions;
+      displayProducts(products, "myInventions");
+    });
 
-          if(result != null){
-
-            var products = result.inventions;
-            var new_product = {productName: document.getElementById("productName").value, productPhoto: document.getElementById("productPhoto").value
-            , productCost: document.getElementById("productCost").value, productMaterial: document.getElementById("productMaterial").value, 
-            ratings: [], totalRating: 0};
-
-            products.push(new_product);
-            var updateStore = {inventions: products};
-            
-            db.collection('users').updateOne(criteria,{$set: updateStore});
-            console.log("New item added.")
-          }
-        });
+    var allDocuments = db.collection('users').find().toArray();
+    allDocuments.then(function (result){
+      var i=0;
+      while(result[i]){
+        var productList = result[i].inventions;
+        displayProducts(productList, "allInventions"); 
+        i++;
       }
-    </script>
+    });
+  
+  </script>
+
+  <script>
+
+    function displayProducts(productList, elementId){
+      var i=0;
+      while(productList[i]){
+        console.log(productList[i]);
+
+        var product_name = productList[i].productName; 
+        
+        var li = document.createElement("li");
+        var t = document.createTextNode(product_name);
+        li.appendChild(t);
+        document.getElementById(elementId).appendChild(li);
+
+        i++;
+      }
+    }
+
+    function addInvention() {
+      var myDocument = db.collection('users').findOne(criteria);
+      myDocument.then(function (result) {
+
+        if (result != null) {
+
+          var products = result.inventions;
+          var new_product = {
+            productName: document.getElementById("productName").value, productPhoto: document.getElementById("productPhoto").value
+            , productCost: document.getElementById("productCost").value, productMaterial: document.getElementById("productMaterial").value,
+            ratings: [], totalRating: 0
+          };
+
+          products.push(new_product);
+          var updateStore = { inventions: products };
+
+          db.collection('users').updateOne(criteria, { $set: updateStore });
+          console.log("New item added.")
+        }
+      });
+    }
+
+    function getEventTarget(e) {
+        e = e || window.event;
+        return e.target || e.srcElement; 
+    }
+
+    var ul = document.getElementById("allInventions");
+    ul.onclick = function(event) {
+        var target = getEventTarget(event);
+        if(target.innerHTML != "")
+        {
+        console.log(target.innerHTML);
+	    	const newURL = "./invention.html?name=" + name + "&pname=" + target.innerHTML;
+	    	loadUrl(newURL);
+        }
+    };
+
+    function loadUrl(newLocation){
+      window.location = newLocation;
+      return false;
+    }
+
+  </script>
 
 </body>
 
