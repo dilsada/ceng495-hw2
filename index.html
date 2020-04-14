@@ -4,19 +4,23 @@
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="utf-8" http-equiv="encoding">
     <title>Invention Gallery</title>
+    <link rel="stylesheet" href="./styles/style.css" type="text/css"/>
     <script src="https://s3.amazonaws.com/stitch-sdks/js/bundles/4.6.0/stitch.js"></script>
 
 </head>
 
 <body>
 
-<h2>Invention Gallery</h2>
+    <div class="login-form">
+        <h2>Welcome to Invention Gallery</h2>
 
-    Name: <input type="text" id="name" style="border:2px solid DodgerBlue;" >
-
-    <button class="button" onclick="addUser()" value="addUser">Add</button>
-    <button class="button" onclick="deleteUser()" value="deleteUser">Delete</button>
-    <button class="button" onclick="login()" value="login">Login</button>
+        <input type="text" id="name" class="input-name" placeholder="Username" >
+        <h1></h1>    
+        <button class="button" onclick="addUser()" value="addUser">Add</button>
+        <button class="button" onclick="deleteUser()" value="deleteUser">Delete</button>
+        <button class="button" onclick="login()" value="login">Login</button>
+        
+    </div>
 
 
     <script>
@@ -26,9 +30,7 @@
         client.auth.loginWithCredential(new stitch.AnonymousCredential()).then(user =>
           db.collection('users').find({owner_id: client.auth.user.id}, { limit: 100}).asArray()
         ).then(docs => {
-            console.log("Found docs", docs)
-            console.log(client.auth.user.id)
-            console.log("[MongoDB Stitch] Connected to Stitch")
+            console.log("Connected to Stitch App")
         }).catch(err => {
           console.error(err)
         });
@@ -39,20 +41,14 @@
         function addUser(){
             db.collection('users').findOne({user_name: document.getElementById("name").value}).then(function(result){
                 if(result != null){
-                    alert("User already exists");              
+                    alert("User already exists.");              
                 }
                 else if(document.getElementById("name").value === ""){
-                    alert("Name section cannot be empty.");                      
+                    alert("Enter a valid username.");                      
                 }
                 else{
-                    //console.log("gonna add the user");
-                    db.collection('users').insertOne({user_name: document.getElementById("name").value, inventions: []})
-                    .then(docs => {
-                    console.log("Found docs", docs)
-                    }).catch(err => {
-                    console.error(err)
-                    });  
-                    alert("User is added");
+                    db.collection('users').insertOne({user_name: document.getElementById("name").value, inventions: []});
+                    alert("User is added.");
                 }
             });
         }
@@ -66,10 +62,10 @@
                     .catch(err => {
                     console.error(err)
                     }));
-                    alert("User deleted.");              
+                    alert("User is deleted.");              
                 }
                 else{
-                    alert("There is no such a user.");
+                    alert("Cannot find user.");
                 }
             });
         }
@@ -84,7 +80,7 @@
                     loadUrl("./user.html?name=" + loginName);
                 }
                 else{
-                    alert("There is no such a user.");
+                    alert("User doesn't exist.");
                 }
             });
         }
@@ -93,7 +89,6 @@
             window.location = newLocation;
             return false;
         }
-    
     
     </script>
 

@@ -1,0 +1,42 @@
+.login-form{
+    margin-left: 20px;
+}
+
+.input-name{
+    padding: 5px 10px;
+}
+
+.add-invention{
+    margin-top: 20px;
+}
+
+#product-img{
+    height: 200px;
+    width: auto;
+}
+
+#product{
+    margin: 25px;
+}
+
+#product-text{
+    text-align: center;
+}
+#product-text:hover{
+    cursor: pointer;
+    color: rgb(119, 41, 41);
+}
+
+#allInventions{
+    display: flex;
+}
+
+p{
+    color: rgb(212, 66, 66);
+    font-size: 24px;
+    font-weight: 400 ;
+}
+::placeholder{
+    color: rgb(77, 82, 87);
+    font-size: 18px;
+}
