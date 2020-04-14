@@ -101,18 +101,31 @@
 
         if (result != null) {
 
-          var products = result.inventions;
-          var new_product = {
-            productName: document.getElementById("productName").value, productPhoto: document.getElementById("productPhoto").value
-            , productCost: document.getElementById("productCost").value, productMaterial: document.getElementById("productMaterial").value,
-            ratings: [], totalRating: 0
-          };
+          if(document.getElementById("productName").value == "" || document.getElementById("productPhoto").value == "" ||
+          document.getElementById("productCost").value == "" || document.getElementById("productMaterial").value == ""){
+            
+            alert("Fill the form completely.");
+          }
 
-          products.push(new_product);
-          var updateStore = { inventions: products };
+          else{
+            // What to do with optional elements ?? 
+            var products = result.inventions;
+            var productNameArray = document.getElementById("productName").value;
+            var product_name = productNameArray.split(" ").join("");
+  
+            var new_product = {
+              productName: product_name, productPhoto: document.getElementById("productPhoto").value, 
+              productCost: document.getElementById("productCost").value, productMaterial: document.getElementById("productMaterial").value,
+              ratings: [], totalRating: 0
+            };
 
-          db.collection('users').updateOne(criteria, { $set: updateStore });
-          console.log("New item added.")
+            products.push(new_product);
+            var updateStore = { inventions: products };
+
+            db.collection('users').updateOne(criteria, { $set: updateStore });
+            console.log("New item added.")
+            }
+          
           clearForm();
         }
       });

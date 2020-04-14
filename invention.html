@@ -5,7 +5,74 @@
   <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
   <meta content="utf-8" http-equiv="encoding">
   <title>Invention Page</title>
+  <link rel="stylesheet" href="./styles/style.css" type="text/css"/>
   <script src="https://s3.amazonaws.com/stitch-sdks/js/bundles/4.6.0/stitch.js"></script>
 </head>
+
+<body>
+  <h2>Invention Information</h2>
+  <h3 id = "product_owner"></h3>
+  <img id="product_photo" class="product-img">
+  <h3 id = "product_name"></h3>
+  <h3 id = "product_cost"></h3>
+  <h3 id = "product_material"></h3>
+  <h3 id = "product_rating"></h3>
+
+
+  <button type="button" onclick="dropProduct()">Drop Product</button>
+
+  <div>
+    <input type="radio" id="_1" name="rating">
+    <input type="radio" id="_2" name="rating">
+    <input type="radio" id="_3" name="rating">
+    <input type="radio" id="_4" name="rating">
+    <input type="radio" id="_5" name="rating">
+    <button type="button" onclick="rateProduct()">Rate Product</button>
+  </div>
+  
+  <button type="button" onclick="BackToUser()">Back</button>
+
+
+  <script>
+    const client = stitch.Stitch.initializeDefaultAppClient('hw2-app-kktvp');
+    const db = client.getServiceClient(stitch.RemoteMongoClient.factory, 'mongodb-atlas').db('ceng495_hw2_db');
+    const name = (new URL(window.location.href)).searchParams.get("name");
+    const invention_name = (new URL(window.location.href)).searchParams.get("pname");
+    const criteria = { user_name: name }
+
+    //Find the product owner
+    var allDocuments = db.collection('users').find().toArray();
+    allDocuments.then(function (result){
+      if(result != null){
+        
+        var i=0;
+        while(result[i]){
+          var productList = result[i].inventions;
+
+          for(item in productList){
+            if(productList[item].productName == invention_name ){
+              document.getElementById('product_owner').innerHTML = "Product Owner: " + result[i].user_name;
+              document.getElementById("product_photo").src = productList[item].productPhoto;
+              document.getElementById("product_name").innerHTML = "Product Name: " + invention_name; 
+              document.getElementById("product_cost").innerHTML = "Cost: " + productList[item].productCost;
+              document.getElementById("product_material").innerHTML = "Material(s) Used: " + productList[item].productMaterial;
+              document.getElementById("product_rating").innerHTML = "Rating: " + productList[item].totalRating;
+            }
+          } 
+          i++;
+        }
+
+      }
+    });
+      
+
+  </script>
+
+  <script>
+    
+  </script>
+
+
+</body>
 
 </html>
