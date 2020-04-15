@@ -17,6 +17,8 @@
   <h3 id = "product_cost"></h3>
   <h3 id = "product_material"></h3>
   <h3 id = "product_rating"></h3>
+  <h3 id = "Optional1"></h3>
+  <h3 id = "Optional2"></h3>
 
 
   <button type="button" onclick="dropProduct()">Drop Product</button>
@@ -60,6 +62,8 @@
               document.getElementById("product_cost").innerHTML = "Cost: " + productList[item].productCost;
               document.getElementById("product_material").innerHTML = "Material(s) Used: " + productList[item].productMaterial;
               document.getElementById("product_rating").innerHTML = "Rating: " + productList[item].totalRating;
+              document.getElementById("Optional1").innerHTML = productList[item].optionalElement1;
+              document.getElementById("Optional2").innerHTML = productList[item].optionalElement2;
             }
           } 
           i++;
@@ -89,7 +93,8 @@
                   var new_product = {
                     productName: productList[item].productName, productPhoto: productList[item].productPhoto, 
                     productCost: productList[item].productCost, productMaterial: productList[item].productMaterial,
-                    ratings: productList[item].ratings, totalRating: productList[item].totalRating, isVisible: false
+                    ratings: productList[item].ratings, totalRating: productList[item].totalRating, isVisible: false,
+                    optionalElement1: productList[item].optionalElement1 , optionalElement2: productList[item].optionalElement2
                   };
 
                   productList.splice(item, 1);
@@ -100,7 +105,7 @@
                   console.log("Item dropped.")
                 }
                 else{
-                  alert("Only owner can drop the item.");
+                  alert("Only owner can drop a product.");
                 } 
               }
             } 

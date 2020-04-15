@@ -27,11 +27,9 @@
     <h1></h1>
     <input type="text" placeholder="Material(s)" id="productMaterial">
     <h1></h1>
-    <input type="text" placeholder="Optional Field 1" id="optionalKey1">:
-    <input type="text" placeholder="Optional Field 1" id="optionalValue1">
+    <input type="text" placeholder="Optional Field 1" id="optional1">:
     <h1></h1>
-    <input type="text" placeholder="Optional Field 2" id="optionalKey2">:
-    <input type="text" placeholder="Optional Field 2" id="optionalValue2">
+    <input type="text" placeholder="Optional Field 2" id="optional2">:
     <h1></h1>
     <button class="button" onclick="addInvention()" value="addInvention">Add Invention</button>
   </div>
@@ -121,8 +119,11 @@
   
             var new_product = {
               productName: product_name, productPhoto: document.getElementById("productPhoto").value, 
-              productCost: document.getElementById("productCost").value, productMaterial: document.getElementById("productMaterial").value,
-              ratings: [], totalRating: 0, isVisible: true
+              productCost: document.getElementById("productCost").value, 
+              productMaterial: document.getElementById("productMaterial").value,
+              ratings: [], totalRating: 0, isVisible: true ,
+              optionalElement1: document.getElementById("optional1").value,
+              optionalElement2: document.getElementById("optional2").value
             };
 
             products.push(new_product);
