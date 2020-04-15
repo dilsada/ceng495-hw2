@@ -27,9 +27,9 @@
     <h1></h1>
     <input type="text" placeholder="Material(s)" id="productMaterial">
     <h1></h1>
-    <input type="text" placeholder="Optional Field 1" id="optional1">:
+    <input type="text" placeholder="Optional Field 1" id="optional1">
     <h1></h1>
-    <input type="text" placeholder="Optional Field 2" id="optional2">:
+    <input type="text" placeholder="Optional Field 2" id="optional2">
     <h1></h1>
     <button class="button" onclick="addInvention()" value="addInvention">Add Invention</button>
   </div>
@@ -54,22 +54,6 @@
   </script>
 
   <script>
-
-    function getRating(){
-      var sum = 0;
-      var myDocument = db.collection('users').findOne(criteria);
-      myDocument.then(function (result) {
-        if (result != null) {
-
-          var products = result.inventions;
-          for(var i=0; i < products.length; i++){
-            sum += products[i].totalRating;
-          }
-          sum = sum / products.length;
-        }
-      });
-      return sum;
-    }
 
     function displayProducts(productList, elementId){
       var i=0;
@@ -99,42 +83,55 @@
       }
     }
 
+
     function addInvention() {
-      var myDocument = db.collection('users').findOne(criteria);
-      myDocument.then(function (result) {
 
-        if (result != null) {
+      db.collection('users').findOne({"inventions.productName": document.getElementById("productName").value })
+      .then(function(res){
+        //check if product name is on db
+        
+        if(res != null){
+          alert("Invention name already exists.");
+        }
 
-          if(document.getElementById("productName").value == "" || document.getElementById("productPhoto").value == "" ||
-          document.getElementById("productCost").value == "" || document.getElementById("productMaterial").value == ""){
-            
-            alert("Fill the form completely.");
-          }
+        else{
+          var myDocument = db.collection('users').findOne(criteria);
+          myDocument.then(function (result) {
 
-          else{
-            // What to do with optional elements ?? 
-            var products = result.inventions;
-            var productNameArray = document.getElementById("productName").value;
-            var product_name = productNameArray.split(" ").join("");
-  
-            var new_product = {
-              productName: product_name, productPhoto: document.getElementById("productPhoto").value, 
-              productCost: document.getElementById("productCost").value, 
-              productMaterial: document.getElementById("productMaterial").value,
-              ratings: [], totalRating: 0, isVisible: true ,
-              optionalElement1: document.getElementById("optional1").value,
-              optionalElement2: document.getElementById("optional2").value
-            };
+            if (result != null) {
 
-            products.push(new_product);
-            var updateProducts = { inventions: products };
-            db.collection('users').updateOne(criteria, { $set: updateProducts });
-            console.log("New item added.")
+              if(document.getElementById("productName").value == "" || document.getElementById("productPhoto").value == "" ||
+              document.getElementById("productCost").value == "" || document.getElementById("productMaterial").value == ""){
+                
+                alert("Fill the form completely.");
+              }
+
+              else{
+                var products = result.inventions;
+                var productNameArray = document.getElementById("productName").value;
+                var product_name = productNameArray.split(" ").join("");
+      
+                var new_product = {
+                  productName: product_name, productPhoto: document.getElementById("productPhoto").value, 
+                  productCost: document.getElementById("productCost").value, 
+                  productMaterial: document.getElementById("productMaterial").value,
+                  ratings: [], totalRating: 0, isVisible: true ,
+                  optionalElement1: document.getElementById("optional1").value,
+                  optionalElement2: document.getElementById("optional2").value
+                };
+
+                products.push(new_product);
+                var updateProducts = { inventions: products };
+                db.collection('users').updateOne(criteria, { $set: updateProducts });
+                alert("New item added.")
+              }
+              
+              clearForm();
             }
-          
-          clearForm();
+          });
         }
       });
+      
     }
 
     function clearForm(){
@@ -165,7 +162,22 @@
   <script>
 
     document.getElementById('username').innerHTML = "Username: " + name;
-    document.getElementById('userRating').innerHTML = "Rating: " + getRating();
+
+    var sum = 0;
+    var myDocument = db.collection('users').findOne(criteria);
+    myDocument.then(function (result) {
+      if (result != null) {
+
+        var products = result.inventions;
+        for(var i=0; i < products.length; i++){
+          sum += products[i].totalRating;
+        }
+        if(products.length != 0){
+          sum = sum / products.length;
+        }
+        document.getElementById('userRating').innerHTML = "Rating: " + sum + "/5";
+      }
+    });
 
     var allDocuments = db.collection('users').find().toArray();
     allDocuments.then(function (result){

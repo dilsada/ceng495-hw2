@@ -25,11 +25,11 @@
   <h1></h1>
 
   <div>
-    <input type="radio" id="_1" name="rating">
-    <input type="radio" id="_2" name="rating">
-    <input type="radio" id="_3" name="rating">
-    <input type="radio" id="_4" name="rating">
-    <input type="radio" id="_5" name="rating">
+    <input type="radio" value="1" name="rating">
+    <input type="radio" value="2" name="rating">
+    <input type="radio" value="3" name="rating">
+    <input type="radio" value="4" name="rating">
+    <input type="radio" value="5" name="rating">
     <h1></h1>
     <button type="button" onclick="rateProduct()">Rate Product</button>
   </div>
@@ -54,7 +54,7 @@
         while(result[i]){
           var productList = result[i].inventions;
 
-          for(item in productList){
+          for(var item in productList){
             if(productList[item].productName == invention_name ){
               document.getElementById('product_owner').innerHTML = "Product Owner: " + result[i].user_name;
               document.getElementById("product_photo").src = productList[item].productPhoto;
@@ -86,7 +86,7 @@
           while(result[i]){
             var productList = result[i].inventions;
 
-            for(item in productList){
+            for(var item in productList){
               if(productList[item].productName == invention_name ){
                 if(result[i].user_name == name){
 
@@ -115,77 +115,79 @@
     }
 
     function findAverage(arr){
-      console.log(arr);
       if(arr.length == 0){
         return 0;
       }
       else{
-        console.log(arraySum(arr)/arr.length);
         return arraySum(arr)/arr.length;
       }
     }
 
+    function radioButtonValue() { 
+      var ele = document.getElementsByName('rating'); 
+        
+      for(var i = 0; i < ele.length; i++) { 
+        if(ele[i].checked) 
+          return parseInt(ele[i].value); 
+      }
+      return -1;
+    } 
+
     function rateProduct(){
 
-      var allDocuments = db.collection('users').find().toArray();
-      allDocuments.then(function (result){
-        if(result != null){
-          
-          var i=0;
-          var searchFlag = true;
+      var val = radioButtonValue();
+      if(val == -1){
+        alert("Choose a valid rating.");
+      }
 
-          while(result[i]){
-            var productList = result[i].inventions;
+      else{
+        var allDocuments = db.collection('users').find().toArray();
+        allDocuments.then(function (result){
+          if(result != null){
+            
+            var i=0;
+            while(result[i]){
+              var productList = result[i].inventions;
 
-            for(item in productList){
+              for(var item in productList){
 
-              var product = productList[item];
+                var product = productList[item];
 
-              if(product.productName == invention_name ){
-                var val = 3; //to be replaced
-                searchFlag = false;
-                
-                var findRating = db.collection('users').findOne({ $and: [
-                  { "inventions.productName": invention_name },
-                  { "inventions.ratings.rating_user": name }
-                ] });
-
-                findRating.then(function(ratingResult){
+                if(product.productName == invention_name ){
                   
-                  if(ratingResult == null){
-                    //new record
+                  var ratingFlag = true;
+                  for(var r in product.ratings){
+                    if(product.ratings[r].rating_user == name){
+                      console.log("update record");
+                      product.ratings[r].rating_value = val;
+                      ratingFlag = false;
+                    } 
+                  }
+                  if(ratingFlag){
+                    console.log("new record");
                     var rating_entry = { rating_user: name, rating_value: val};
                     product.ratings.push(rating_entry);
-
                   }
-
-                  else{
-                    //Update record
-                    for(r in product.ratings){
-                     if(product.ratings[r].rating_user == name){
-                      product.ratings[r].rating_value = val;
-                     } 
-                    }
-                  }
-
+                
                   var ratingValues = []
-                  for(j in product.ratings){
+                  for(var j in product.ratings){
                     ratingValues.push(product.ratings[j].rating_value);
                   }
 
                   product.totalRating = findAverage(ratingValues);
                   var updateProducts = {inventions: productList};
                   db.collection('users').updateOne({user_name: result[i].user_name } ,{$set: updateProducts});
-                  
-                });
-                break;
+                    
+                  break;
+                }
               }
+              i++;
             }
-            if(!searchFlag){break;} 
-            i++;
           }
-        }
-      });
+        });
+        alert("New rating for "+ invention_name +" saved.");
+      }
+
     }
 
 
