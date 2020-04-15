@@ -61,7 +61,7 @@
               document.getElementById("product_name").innerHTML = "Product Name: " + invention_name; 
               document.getElementById("product_cost").innerHTML = "Cost: " + productList[item].productCost;
               document.getElementById("product_material").innerHTML = "Material(s) Used: " + productList[item].productMaterial;
-              document.getElementById("product_rating").innerHTML = "Rating: " + productList[item].totalRating;
+              document.getElementById("product_rating").innerHTML = "Total Rating: " + productList[item].totalRating + "/5";
               document.getElementById("Optional1").innerHTML = productList[item].optionalElement1;
               document.getElementById("Optional2").innerHTML = productList[item].optionalElement2;
             }
@@ -89,19 +89,12 @@
             for(item in productList){
               if(productList[item].productName == invention_name ){
                 if(result[i].user_name == name){
-                  
-                  var new_product = {
-                    productName: productList[item].productName, productPhoto: productList[item].productPhoto, 
-                    productCost: productList[item].productCost, productMaterial: productList[item].productMaterial,
-                    ratings: productList[item].ratings, totalRating: productList[item].totalRating, isVisible: false,
-                    optionalElement1: productList[item].optionalElement1 , optionalElement2: productList[item].optionalElement2
-                  };
 
-                  productList.splice(item, 1);
-                  productList.push(new_product);
+                  productList[item].isVisible = false;
 
                   var updateProducts = {inventions: productList};
                   db.collection('users').updateOne(criteria,{$set: updateProducts});
+                  
                   console.log("Item dropped.")
                 }
                 else{
@@ -109,6 +102,86 @@
                 } 
               }
             } 
+            i++;
+          }
+        }
+      });
+    }
+
+    function arraySum(arr){
+      return arr.reduce(function(a,b){
+        return a + b
+      }, 0);
+    }
+
+    function findAverage(arr){
+      console.log(arr);
+      if(arr.length == 0){
+        return 0;
+      }
+      else{
+        console.log(arraySum(arr)/arr.length);
+        return arraySum(arr)/arr.length;
+      }
+    }
+
+    function rateProduct(){
+
+      var allDocuments = db.collection('users').find().toArray();
+      allDocuments.then(function (result){
+        if(result != null){
+          
+          var i=0;
+          var searchFlag = true;
+
+          while(result[i]){
+            var productList = result[i].inventions;
+
+            for(item in productList){
+
+              var product = productList[item];
+
+              if(product.productName == invention_name ){
+                var val = 3; //to be replaced
+                searchFlag = false;
+                
+                var findRating = db.collection('users').findOne({ $and: [
+                  { "inventions.productName": invention_name },
+                  { "inventions.ratings.rating_user": name }
+                ] });
+
+                findRating.then(function(ratingResult){
+                  
+                  if(ratingResult == null){
+                    //new record
+                    var rating_entry = { rating_user: name, rating_value: val};
+                    product.ratings.push(rating_entry);
+
+                  }
+
+                  else{
+                    //Update record
+                    for(r in product.ratings){
+                     if(product.ratings[r].rating_user == name){
+                      product.ratings[r].rating_value = val;
+                     } 
+                    }
+                  }
+
+                  var ratingValues = []
+                  for(j in product.ratings){
+                    ratingValues.push(product.ratings[j].rating_value);
+                  }
+
+                  product.totalRating = findAverage(ratingValues);
+                  var updateProducts = {inventions: productList};
+                  db.collection('users').updateOne({user_name: result[i].user_name } ,{$set: updateProducts});
+                  
+                });
+                break;
+              }
+            }
+            if(!searchFlag){break;} 
             i++;
           }
         }
