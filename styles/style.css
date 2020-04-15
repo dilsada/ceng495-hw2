@@ -45,3 +45,7 @@ p{
     color: rgb(77, 82, 87);
     font-size: 18px;
 }
+
+button{
+    cursor: pointer;
+}

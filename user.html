@@ -43,6 +43,9 @@
     
   </div>
 
+  <div>
+    <button class="button" onclick="toHomepage()">Back to Home</button>
+  </div>
 
   <script>
     const client = stitch.Stitch.initializeDefaultAppClient('hw2-app-kktvp');
@@ -73,24 +76,27 @@
     function displayProducts(productList, elementId){
       var i=0;
       while(productList[i]){
-        var product_name = productList[i].productName; 
-        var product_img = productList[i].productPhoto;
-
-        var link = document.createElement("a");
-        var img = document.createElement("img");
-        img.src = product_img;
-        var text = document.createElement("h3");
-        text.innerHTML = product_name;
-
-        link.id = "product";
-        img.id = "product-img";
-        text.id = "product-text";
         
-        link.appendChild(img);
-        link.append(text);
+        if(productList[i].isVisible){
+          var product_name = productList[i].productName; 
+          var product_img = productList[i].productPhoto;
 
-        document.getElementById(elementId).appendChild(link);
+          var link = document.createElement("a");
+          var img = document.createElement("img");
+          img.src = product_img;
+          var text = document.createElement("h3");
+          text.innerHTML = product_name;
 
+          link.id = "product";
+          img.id = "product-img";
+          text.id = "product-text";
+          
+          link.appendChild(img);
+          link.append(text);
+
+          document.getElementById(elementId).appendChild(link);
+
+        }
         i++;
       }
     }
@@ -116,13 +122,12 @@
             var new_product = {
               productName: product_name, productPhoto: document.getElementById("productPhoto").value, 
               productCost: document.getElementById("productCost").value, productMaterial: document.getElementById("productMaterial").value,
-              ratings: [], totalRating: 0
+              ratings: [], totalRating: 0, isVisible: true
             };
 
             products.push(new_product);
-            var updateStore = { inventions: products };
-
-            db.collection('users').updateOne(criteria, { $set: updateStore });
+            var updateProducts = { inventions: products };
+            db.collection('users').updateOne(criteria, { $set: updateProducts });
             console.log("New item added.")
             }
           
@@ -150,6 +155,10 @@
     function loadUrl(newLocation){
       window.location = newLocation;
       return false;
+    }
+
+    function toHomepage(){
+      loadUrl("./index.html");
     }
 
   </script>
